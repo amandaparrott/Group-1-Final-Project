@@ -1,71 +1,111 @@
-create schema blogs;
-use blogs;
+create db calendar;
 
-create table Blogs (
-   id int not null auto_increment primary key,
-   title varchar(100) not null,
-   content text not null,
-   authorid int not null,
-   _created datetime default current_timestamp,
-   foreign key (authorid) references Authors(id)
-); 
+create schema pUser;
+use calendar;
 
-create table Authors (
+/*
+pUser                                                
+Id
+Name
+Email
+Password
+Role
+parentid
+_created 
+(parent user account would have admin privileges and be able to set mandatory tasks)
+*/
+
+
+create table pUser (
    id int not null auto_increment primary key,
-   name varchar(70) not null,
+   name varchar(100) not null,
    email varchar(70) not null,
-   _created datetime default current_timestamp
-);
+   password varchar(60) not null,
+   role varchar(5) not null,
+   parentid int not null,
+   _created datetime default current_timestamp,
+    foreign key (parentid) references pUser(id)
+); 
 
-create table Tags (
+/*
+cUser
+Id
+Name
+Email
+Password
+Role
+Childid
+_created
+(child user account will be connected to parent user account. They can still set their own events, but cannot override what the parent sets as mandatory)
+*/
+
+create table cUser (
    id int not null auto_increment primary key,
-   name varchar(25) not null,
+   name varchar(100) not null,
+   email varchar(70) not null,
+   password varchar(60) not null,
+   role varchar(5) not null,
+   childid int not null,
+   _created datetime default current_timestamp,
+    foreign key (childid) references cUser(id)
+); 
+
+/*
+Events
+Id
+Title
+Location
+Time
+date/duedate
+Mandatorytask (boolean)
+completedtask (boolean)
+categoryId
+_created
+*/
+
+create table events (
+   id int not null auto_increment primary key,
+   title varchar(50) not null,
+   location varchar(70) not null,
+   time varchar(50) not null,
+   duedate varchar(10) not null, 
+   mandatorytask boolean,
+   completedtask boolean,
+   categoryid int not null,
+   _created datetime default current_timestamp,
+    foreign key (categoryid) references events(id)
+); 
+
+/*
+Category
+Id
+Name
+_created
+(would work like blogtags from personal blog lab)
+*/
+
+create table category (
+   id int not null auto_increment primary key,
+   name varchar(100) not null,
    _created datetime default current_timestamp
 ); 
 
-create table BlogTags (
-   blogid int not null,
-   tagid int not null,
-   primary key(blogid, tagid),
-   foreign key (blogid) references Blogs(id),
-   foreign key (tagid) references Tags(id)
-);
+/*
+EventTags 
+Categoryid
+cUserId
+pUserId
+*/
 
-insert into authors (name, email) values
-("Garrett", "code@garrett.com");
+create table EventTags (
+    foreign key (categoryid) references category(id),
+    foreign key (cUserid) references cUser(childid),
+    foreign key (parentid) references pUser(parentid)
+); 
 
-INSERT INTO Blogs(title, content, authorid) VALUES(
-	"Why Betsy Should Date Me", "I'll tell you why. I think she's a lonely person. I drive by this place a lot and I see her here. I see a lot of people around her. And I see all these phones and all this stuff on her desk. It means nothing. Then when I came inside and I met her, I saw in her eyes and I saw the way she carried yourself that she's not a happy person. And I think she needs something. And if she wants to call it a friend, she can call it a friend.", 1);
-INSERT INTO Blogs(title, content, authorid) VALUES(
-	"The Effects of Coffee on The Human Body", "It make you go zoom zoom heart go thump thump. Heart go thump thump then brain go zig zag. After the zig zag scary thought may pop up in head but you just have to eat food then they kinda go away! That coffee for you! Thank for reading", 2);
-INSERT INTO Blogs(title, content, authorid) VALUES(
-	"Sitting Down on Computer All The Time", "Shoulder hurt back hurt but if walk arounda alittle bit then not as much pain. Headache from light from screen and problem solving all day but if u get glasses from amazon then it not as bad. Still need to try yoga for upper back but only did it once. Thanks", 3);
+/*Addtn'l checklist items refer to the the Overview Doc - pulling existing items form something else but we can always adjust frontend*/
 
-insert into tags (name) values
-("coding"),
-("lifestyle"),
-("tech"),
-("literature"),
-("political");
-
-insert into blogtags (blogid, tagid) values
-(1, 2),
-(1, 3),
-(2, 5),
-(3, 4);
-
-DELIMITER //
-CREATE PROCEDURE spBlogTags (blogid int)
-BEGIN
-  SELECT tags.name FROM blogtags
-  JOIN tags 
-  ON blogtags.tagid = tags.id
-  WHERE blogtags.blogid = blogid;
-END //
-DELIMITER ;
-
-call spBlogTags(2);
-call spBlogTags(1);
-
+/*
 CREATE USER 'blogs'@'localhost' IDENTIFIED BY 'blogs123';
 GRANT ALL PRIVILEGES ON blogs.* TO 'blogs'@'localhost';
+*/
