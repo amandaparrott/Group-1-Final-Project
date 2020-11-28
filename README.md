@@ -11,6 +11,8 @@ This project is a starting point for a TypeScript based React app that also has 
 
 There are 2 different Webpack configurations. One for the server and one for the client.
 
+https://www.youtube.com/watch?v=MqczHS3Z2bc -> to finish Auth0
+
 ## Server
 The server build process compiles the TypeScript files found in `/src/server` into a single bundled JavaScript file located in the `/dist` directory.
 
