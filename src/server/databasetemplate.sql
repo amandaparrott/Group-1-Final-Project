@@ -72,8 +72,10 @@ create table events (
    mandatorytask boolean,
    completedtask boolean,
    categoryid int not null,
+   childid int not null,
    _created datetime default current_timestamp,
     foreign key (categoryid) references events(id)
+    foreign key (childid) references cUser(id)
 ); 
 
 /*
