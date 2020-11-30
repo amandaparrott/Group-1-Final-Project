@@ -1,22 +1,27 @@
-import React from 'react';
+import React, { Component } from 'react';
 import './App.css';
-import LoginButton from './components/LoginButton';
-import LogoutButton from './components/LogoutButton';
-import Profile from './components/Profile';
-import { useAuth0 } from '@auth0/auth0-react';
-
-function App() {
-  const { isLoading } = useAuth0();
-
-  if (isLoading) return <div>Loading...</div>
-
-  return (
-    <>
-      <LoginButton />
-      <LogoutButton />
-      <Profile />
-    </>
-  );
+import React, { Component } from 'react';
+import GoogleLogin from 'react-google-login';
+export class App extends Component {
+  responseGoogle=(response)=>{
+    console.log(response);
+    console.log(response.profileObj);
+  }
+  
+  render() {
+    return (
+      <div>
+        <GoogleLogin
+        clientId="1047154584171-ea5rs8hr3od5secjqtnsm3vpfrr8abou.apps.googleusercontent.com"
+        buttonText="Login"
+        onSuccess={this.responseGoogle}
+        onFailure={this.responseGoogle}
+        cookiePolicy={'single_host_origin'}
+        
+        />
+      </div>
+    )
+  }
 }
 
 export default App;
