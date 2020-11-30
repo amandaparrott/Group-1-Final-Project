@@ -7,8 +7,8 @@ export const Connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "eventsapp",
-    password: "",
-    database: ""
+    password: "group1",
+    database: "calendar"
 });
 
 export const Query = (query, values) => {

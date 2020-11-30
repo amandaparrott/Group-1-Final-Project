@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
     try {
-        const data = await db.Chirps.all();
+        const data = await db.events.all();
         res.json(data);
     } catch (err) {
         console.log(err);
@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
     try {
         const id = req.params.id;
-        const data = await db.Chirps.one(id);
+        const data = await db.events.one(id);
         res.send(data[0]);
     } catch (err) {
         console.log(err);
@@ -27,16 +27,16 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", async (req, res) => {
     try {
-        const newUserName = req.body.name;
-        const newChirpContent = req.body.content;
+        const neweventName = req.body.name;
+        const neweventContent = req.body.content;
 
-        const newUser = await db.Users.insert(newUserName);
-        const newUserId = newUser.insertId;
+        const newevent = await db.event.insert(neweventName);
+        const neweventId = newevent.insertId;
 
-        const newChirp = await db.Chirps.insert(newUserId, newChirpContent);
+        const newTask = await db.events.insert(neweventId, neweventContent);
         res.status(200).send(`
-        user created with id: ${newUserId}
-        chirp created with id: ${newChirp.insertId}
+        user created with id: ${neweventId}
+        event created with id: ${newTask.insertId}
         `);
     } catch (err) {
         console.log(err);
@@ -47,11 +47,11 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
     try {
         const id = req.params.id;
-        const newChirpContent = req.body.content;
+        const neweventsContent = req.body.content;
 
-        await db.Chirps.update(newChirpContent, id);
+        await db.events.update(neweventsContent, id);
     
-        res.status(200).send(`Updated chirp ${id}`)
+        res.status(200).send(`Updated event ${id}`)
     } catch (err) {
         console.log(err);
         res.status(500).send(err);
@@ -62,10 +62,10 @@ router.delete("/:id", async (req, res) => {
     try {
         const id = req.params.id;
 
-        await db.Mentions.destroy(id);
-        await db.Chirps.destroy(id);
+       
+        await db.events.destroy(id);
 
-        res.send(`chirp ${id} was deleted`);
+        res.send(`event ${id} was deleted`);
     } catch (err) {
         console.log(err);
         res.status(500).send(err);
