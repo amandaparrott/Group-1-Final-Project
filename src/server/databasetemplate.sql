@@ -1,67 +1,15 @@
-create db calendar;
+create database calendar;
+use  calendar;
 
-create schema pUser;
-use calendar;
-
-/*
-pUser                                                
-Id
-Name
-Email
-Password
-Role
-parentid
-_created 
-(parent user account would have admin privileges and be able to set mandatory tasks)
-*/
-
-
-create table pUser (
+-- (parent user account would have admin privileges and be able to set mandatory tasks)
+create table users (
    id int not null auto_increment primary key,
    name varchar(100) not null,
    email varchar(70) not null,
    password varchar(60) not null,
-   role varchar(5) not null,
-   parentid int not null,
-   _created datetime default current_timestamp,
-    foreign key (parentid) references pUser(id)
-); 
-
-/*
-cUser
-Id
-Name
-Email
-Password
-Role
-Childid
-_created
-(child user account will be connected to parent user account. They can still set their own events, but cannot override what the parent sets as mandatory)
-*/
-
-create table cUser (
-   id int not null auto_increment primary key,
-   name varchar(100) not null,
-   email varchar(70) not null,
-   password varchar(60) not null,
-   role varchar(5) not null,
-   childid int not null,
-   _created datetime default current_timestamp,
-    foreign key (childid) references cUser(id)
-); 
-
-/*
-Events
-Id
-Title
-Location
-Time
-date/duedate
-Mandatorytask (boolean)
-completedtask (boolean)
-categoryId
-_created
-*/
+   role varchar(6) not null,
+   _created datetime default current_timestamp
+);
 
 create table events (
    id int not null auto_increment primary key,
@@ -71,43 +19,66 @@ create table events (
    duedate varchar(10) not null, 
    mandatorytask boolean,
    completedtask boolean,
-   categoryid int not null,
-   childid int not null,
    _created datetime default current_timestamp,
-    foreign key (categoryid) references events(id)
-    foreign key (childid) references cUser(id)
+	userid int not null
 ); 
 
-/*
-Category
-Id
-Name
-_created
-(would work like blogtags from personal blog lab)
-*/
+ALTER table events
+ADD CONSTRAINT fk_userid
+foreign key (userid) references users(id);
+
+SELECT * FROM events JOIN users ON events.userid = users.id;
+
+create table reminders (
+   id int not null auto_increment primary key,
+   content varchar(70) not null,
+   userid int not null,
+	_created datetime default current_timestamp
+);
+
+alter table reminders
+add constraint fk_userreminderid
+foreign key (userid) references users(id);
+
+create table messages (
+   id int not null auto_increment primary key,
+   content varchar(200) not null,
+    userid int not null,
+	_created datetime default current_timestamp
+);
+
+alter table messages
+add constraint fk_usermessagesid
+foreign key (userid) references users(id);
 
 create table category (
    id int not null auto_increment primary key,
+   userid int not null,
    name varchar(100) not null,
    _created datetime default current_timestamp
-); 
+);
 
-/*
-EventTags 
-Categoryid
-cUserId
-pUserId
-*/
+ALTER table category
+ADD CONSTRAINT fk_usercategoryid
+foreign key (userid) references users(id);
 
 create table EventTags (
-    foreign key (categoryid) references category(id),
-    foreign key (cUserid) references cUser(childid),
-    foreign key (parentid) references pUser(parentid)
-); 
+    eventtagid int not null auto_increment primary key,
+    categoryid int not null,
+    userid int not null
+);
 
-/*Addtn'l checklist items refer to the the Overview Doc - pulling existing items form something else but we can always adjust frontend*/
+alter table eventtags
+drop foreign key eventtagid;
 
-/*
-CREATE USER 'blogs'@'localhost' IDENTIFIED BY 'blogs123';
-GRANT ALL PRIVILEGES ON blogs.* TO 'blogs'@'localhost';
-*/
+alter table EventTags
+add constraint fk_eventtagid
+foreign key (eventtagid) references events(id);
+
+alter table EventTags
+add constraint fk_usereventid
+foreign key (userid) references users(id);
+
+alter table EventTags
+add constraint fk_categoryeventid
+foreign key (categoryid) references category(id);
