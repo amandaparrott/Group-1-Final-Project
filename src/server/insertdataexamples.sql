@@ -73,9 +73,17 @@ insert into EventTags (
 )
 
 VALUES
-(1, 5, 1),
-(2, 4, 2),
+(1, 1, 3),
+(2, 2, 3),
 (3, 3, 3),
-(4, 2, 4),
-(5, 1, 4);
+(4, 4, 4),
+(5, 5, 4);
 select * from eventtags;
+
+SELECT * FROM category JOIN events ON category.id = events.id;
+SELECT * FROM events JOIN users ON events.userid = users.id;
+SELECT * FROM reminders JOIN users ON reminders.userid = users.id;
+SELECT * FROM messages JOIN users ON messages.userid = users.id;
+-- eventtagid references the events(id)
+-- categoryid references the category(id)
+-- references users(id)
